@@ -1,0 +1,138 @@
+\documentclass[a4paper,11pt,oneside,openright,xcolor=dvipsnames]{report}
+\pdfminorversion=7
+
+\usepackage[deliverable,history]{SecureCloud}
+\usepackage{pdflscape}
+\usepackage[hidelinks]{hyperref}
+\usepackage{ulem}
+\usepackage[latin1]{inputenc}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{ifthen}
+\usepackage{algorithm}
+\usepackage{pifont}
+\usepackage{listings}
+
+% define LUA & YAML style
+\definecolor{darkgray}{rgb}{0.5,0.5,0.5}
+\definecolor{darkgreen}{rgb}{0.3,0.5,0.3}
+\definecolor{darkblue}{rgb}{0.3,0.3,0.5}
+\definecolor{darkred}{rgb}{0.5,0.3,0.3}
+
+\lstdefinelanguage{LUA}{
+  sensitive=true,
+  keywordstyle=[1]{\color{darkblue}\bfseries},
+  keywordstyle=[2]{\color{darkgreen}\bfseries},
+  morekeywords=[1]{and,break,do,else,elseif,end,for,function,if,in,local,
+    nil,not,or,repeat,return,then,until,while,require,alias},% Official LUA keywords
+  morekeywords=[2]{},% Your private keywords
+  otherkeywords={.,=,~,*,>,:},
+  morestring=[b]",
+  stringstyle={\color{darkred}\itshape},
+  breaklines=true,
+  breakatwhitespace=true,
+  linewidth=\columnwidth,
+  comment=[l]{--},
+  escapeinside={(*@}{@*)}
+}
+
+\newcommand\YAMLcolonstyle{\color{darkred}\bfseries}
+\newcommand\YAMLkeystyle{\color{darkblue}\bfseries}
+\newcommand\YAMLvaluestyle{\color{darkgray}\bfseries}
+
+\lstdefinelanguage{YAML}{
+  keywords={true,false,null,y,n},
+  keywordstyle=\color{darkgreen}\bfseries,
+  basicstyle=\YAMLkeystyle,
+  sensitive=false,
+  comment=[l]{\#},
+  morecomment=[s]{/*}{*/},
+  commentstyle=\color{purple}\ttfamily,
+  stringstyle=\YAMLvaluestyle\ttfamily,
+  moredelim=[l][\color{orange}]{\&},
+  moredelim=[l][\color{magenta}]{*},
+  moredelim=**[il][\YAMLcolonstyle{:}\YAMLvaluestyle]{:},   % switch to value style at :
+  morestring=[b]',
+  morestring=[b]",
+  literate =    {---}{{\ProcessThreeDashes}}3
+                {>}{{\textcolor{red}\textgreater}}1
+                {|}{{\textcolor{red}\textbar}}1
+                {\ -\ }{{\mdseries\ -\ }}3,
+}
+% END define LUA & YAML style
+
+\newboolean{shownotes}
+\setboolean{shownotes}{true}
+% \setboolean{shownotes}{false}
+\ifthenelse{\boolean{shownotes}}
+{ \newcommand{\citenote}[1]{\begin{quote}{\itshape\color{gray}#1}\end{quote}}}
+{ \newcommand{\citenote}[1]{}}
+
+\hyphenpenalty=2000
+\tolerance=1000
+
+\SECtitle{Specification and design of middleware framework for distributed processing of data using SGX}
+\SECidentifier{D4.3}
+\SECdueDate{... 2017}
+\SECsubmissionDate{... 2017}
+\SECresubmissionDate{... 2017}
+\SECeditor{Pascal Felber}{UniNE}
+%\SECcontributors{All}
+\SECworkPackage{WP4}
+\SECdissLevelPU
+\SECreviewerone{...}{...}
+\SECreviewertwo{...}{...}
+\SECtask{...}{...}{UniNE$^*$}
+\SECrevision{0.1}{2017/07/17}{Aur\'{e}lien Havet}{UniNE}{First draft}
+
+\fancyhead[RO,LE]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+\sloppy
+
+\begin{document}
+
+\setcounter{tocdepth}{2}
+\setcounter{page}{1}
+\pagenumbering{roman}
+
+\tableofcontents
+
+\listoffigures
+
+%\fancyhead{} % clear all header fields
+\fancyhead[RO,LE]{\sffamily\bfseries Secure Big Data Processing in Untrusted Clouds}
+\fancyhead[LO,RE]{\sffamily\bfseries Deliverable 4.3}
+\fancyhead[LO,RE]{\sffamily\bfseries First Revision}
+%\fancyfoot{} % clear all footer fields
+\fancyfoot[CO,CE]{\thepage}
+
+\setcounter{page}{1}
+\pagenumbering{arabic}
+
+\glsresetall
+
+\renewcommand{\emph}[1]{\textbf{#1}}
+
+\renewcommand{\SS}{\textsc{SecureStreams}\xspace}
+\newcommand{\zmq}{\mbox{\textsc{ZeroMQ}}\xspace}
+\newcommand{\rxl}{\mbox{\textsc{RxLua}}\xspace}
+\newcommand{\luavm}{\mbox{\textsc{LuaVM}}\xspace}
+
+\input{1_Introduction}
+\input{2_SoA}
+\input{3_Background}
+\input{4_Architecture}
+\input{5_Prototype}
+\input{6_Evaluation}
+\input{7_Summary}
+\input{8_User_manual}
+
+\begin{raggedright}
+
+\bibliographystyle{IEEEtran}
+\bibliography{Document.bib}
+
+\end{raggedright}
+
+\end{document}

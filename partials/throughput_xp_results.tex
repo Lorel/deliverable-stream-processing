@@ -1,0 +1,40 @@
+\vspace{20pt}
+\hspace*{-\parindent}
+\begin{minipage}{\linewidth}
+  \centering
+  \begin{minipage}{0.3\linewidth}
+    \captionsetup{font=scriptsize}
+    \includegraphics[width=\linewidth]{Figures/plots/secure_streams/throughput/tput_tx_percentiles_1-workers}
+    \captionof*{figure}{Data in clear text, no SGX, 1 worker per stage.}
+    \includegraphics[width=\linewidth]{Figures/plots/secure_streams/throughput/tput_tx_percentiles_2-workers}
+    \captionof*{figure}{Data in clear text, no SGX, 2 workers per stage.}
+    \includegraphics[width=\linewidth]{Figures/plots/secure_streams/throughput/tput_tx_percentiles_4-workers}
+    \captionof*{figure}{Data in clear text, no SGX, 4 workers per stage.}
+  \end{minipage}
+  \hspace{0.03\linewidth}
+  \begin{minipage}{0.3\linewidth}
+    \captionsetup{font=scriptsize}
+    \includegraphics[width=\linewidth]{Figures/plots/secure_streams/throughput/tput_tx_percentiles_1-workers-encrypted-nosgx}
+    \captionof*{figure}{Encrypted data, no SGX, 1 worker per stage.}
+    \includegraphics[width=\linewidth]{Figures/plots/secure_streams/throughput/tput_tx_percentiles_2-workers-encrypted-nosgx}
+    \captionof*{figure}{Encrypted data, no SGX, 2 workers per stage.}
+    \includegraphics[width=\linewidth]{Figures/plots/secure_streams/throughput/tput_tx_percentiles_4-workers-encrypted-nosgx}
+    \captionof*{figure}{Encrypted data, no SGX, 4 workers per stage.}
+  \end{minipage}
+  \hspace{0.03\linewidth}
+  \begin{minipage}{0.3\linewidth}
+    \captionsetup{font=scriptsize}
+    \includegraphics[width=\linewidth]{Figures/plots/secure_streams/throughput/tput_tx_percentiles_1-workers-encrypted-fullsgx}
+    \captionof*{figure}{Encrypted data, processing SGX, 1 worker per stage.}
+    \includegraphics[width=\linewidth]{Figures/plots/secure_streams/throughput/tput_tx_percentiles_2-workers-encrypted-fullsgx}
+    \captionof*{figure}{Encrypted data, processing SGX, 2 workers per stage.}
+    \includegraphics[width=\linewidth]{Figures/plots/secure_streams/throughput/tput_tx_percentiles_4-workers-encrypted-fullsgx}
+    \captionof*{figure}{Encrypted data, processing SGX, 4 workers per stage.}
+  \end{minipage}
+  \captionof{figure}{Streaming throughput.}
+  \label{fig:throughput}
+\end{minipage}
+\vspace{10pt}
+% \captionof*{figure}{Throughput comparison between normal processing (with cleartext data and no encryption), encrypted data but without enclaves, and with encrypted data and SGX processing. We scale the number of worker nodes per stage from $1$ (left-most column), $2$ (center colum) and $4$ (right-most column).}
+% \label{fig:throughput}
+% \end{figure*}
