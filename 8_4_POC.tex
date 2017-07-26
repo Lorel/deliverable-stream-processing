@@ -1,0 +1,62 @@
+\section{How to run the Proof-of-Concept}
+\label{sec:pocusage}
+
+You can find here all the steps to run the proof-of-concept of \SS{}.
+
+
+\subsection{Create a \textsc{Docker Swarm} cluster and its overlay network}
+\label{subsec:pocusage:init-cluster}
+
+After a correct configuration of the remote CLI (see Subsection~\ref{subsec:clustersetup:config} for more explanations), use this one to configure a \textsc{Docker Swarm} cluster and its overlay network:
+
+\begin{lstlisting}[language=bash, basicstyle=\small]
+$ ./remote.rb ping config-docker create network
+\end{lstlisting}
+
+
+\subsection{Import \SS{} code on each node}
+\label{subsec:pocusage:import-code}
+
+The proof-of-concept is based of data which have to be downloaded on the nodes of the cluster where the data streams will be run.
+You have to indicate in the file \texttt{config.yml} of the remote CLI which nodes need to download this code by using the attributes \texttt{roles} for that:
+
+\begin{lstlisting}[language=YAML,caption={Configure some roles for a node of the cluster},label=node-roles-config][t]
+cluster:
+  ...
+
+  nodes:
+    -
+      ip: 172.16.0.4
+      name: 'sgx-1'
+      network_if: 'enp0s31f6'
+      type: sgx
+      roles:
+        - data1
+        - data2
+        - data3
+        - data4
+\end{lstlisting}
+
+You have also to provide in the same file some details about the repository of \SS{}:
+
+\begin{lstlisting}[language=YAML,caption={Configure the repository of \SS{}},label=repo-config][t]
+poc:
+  working_dir: '/home/ubuntu/zmqrxlua'
+  project_name: 'zmqrxlua-poc'
+  experiment_path: 'experiment'
+  remote_repo: repo_url
+\end{lstlisting}
+
+Give as \texttt{remote\_repo} value the address of the repository of \SS{}: \securestreamrepo{}.
+
+After a correct configuration of the remote CLI, use this one to import the code of \SS{}  on each node:
+
+\begin{lstlisting}[language=bash, basicstyle=\small]
+$ ./remote.rb init-xp
+\end{lstlisting}
+
+
+\subsection{Run XP on the cluster}
+\label{subsec:pocusage:run-xp}
+
+Finally, you only have to connect to the host of your \textsc{Docker Swarm} manager, go to the directory \texttt{experiment/test} of the cloned repository, and execute the script \texttt{run.sh}.

@@ -1,0 +1,46 @@
+% -*- root: Document.tex -*-
+
+\subsection{Manage a cluster}
+\label{subsec:clustersetup:manage}
+
+We are assuming that your hosts are all reachable by SSH from the CLI.
+You can ensure that by running:
+
+\begin{lstlisting}[language=bash, basicstyle=\small]
+$ ./remote.rb ping
+\end{lstlisting}
+
+Once the configuration of the hosts to use for creating the cluster has been given, here are the few steps needed to create a cluster:
+
+\begin{itemize}
+  \item \emph{Create nodes}: this command will configure \textsc{Docker} on the nodes to use in the \textsc{Docker Swarm} cluster, by resetting the configuration file of the \textsc{Docker} service of each host, like explained in Subsection~\ref{subsec:docker_config}:
+    \begin{lstlisting}[language=bash, basicstyle=\small]
+  $ ./remote.rb config-docker
+    \end{lstlisting}
+  \item \emph{Create the cluster}: this command will deploy the \textsc{Docker Swarm} cluster:
+    \begin{lstlisting}[language=bash, basicstyle=\small]
+  $ ./remote.rb create
+    \end{lstlisting}
+  \item \emph{Create an overlay network}: this command will create a \textsc{Dockr} overlay network:
+    \begin{lstlisting}[language=bash, basicstyle=\small]
+  $ ./remote.rb network
+    \end{lstlisting}
+\end{itemize}
+
+All these commands can be run at once:
+
+\begin{lstlisting}[language=bash, basicstyle=\small]
+    $ ./remote.rb ping config-docker create network
+\end{lstlisting}
+
+You can ensure that your cluster have been well created by running:
+
+\begin{lstlisting}[basicstyle=\small]
+$ ./remote.rb test
+\end{lstlisting}
+
+If you want to recreate a cluster, use the command \texttt{remove} before, \textit{e.g.}:
+
+\begin{lstlisting}[language=bash, basicstyle=\small]
+    $ ./remote.rb remove
+\end{lstlisting}

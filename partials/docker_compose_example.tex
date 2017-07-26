@@ -1,0 +1,135 @@
+
+\begin{lstlisting}[language=YAML,caption={Configuration file example for \textsc{Docker Compose}.},label=docker-compose-config][t]
+version: '2'
+
+services:
+  printer:
+    image: "lorel/zmqrxlua:lua"
+    entrypoint: lua print-results.lua
+    environment:
+      - FROM=tcp://routerreduceprinter:5562
+      - OUTPUT=$RESULT_OUTPUT
+      - "constraint:type==printer"
+    env_file: global.env
+    volumes:
+      - "/path/to/securestream/code:/root/worker"
+
+    networks:
+      xp:
+        aliases:
+          - controller
+
+  routerreduceprinter:
+    image: "lorel/zmqrxlua:lua"
+    hostname: routerreduceprinter
+    entrypoint: lua router.lua
+    environment:
+      - TO=tcp://*:5562
+      - FROM=tcp://*:5561
+      - "constraint:type==worker"
+    env_file: global.env
+    volumes:
+      - "/path/to/securestream/code:/root/worker"
+    networks:
+      - xp
+
+  reduce:
+    image: "lorel/zmqrxlua:lua"
+    entrypoint: lua reduce-events.lua
+    environment:
+      - TO=tcp://routerreduceprinter:5561
+      - FROM=tcp://routerfilterreduce:5560
+      - "constraint:type==worker"
+    env_file: global.env
+    volumes:
+      - "/path/to/securestream/code:/root/worker"
+    networks:
+      - xp
+
+  routerfilterreduce:
+    image: "lorel/zmqrxlua:lua"
+    hostname: routerfilterreduce
+    entrypoint: lua router.lua
+    environment:
+      - TO=tcp://*:5560
+      - FROM=tcp://*:5559
+      - "constraint:type==worker"
+    env_file: global.env
+    volumes:
+      - "/path/to/securestream/code:/root/worker"
+    networks:
+      - xp
+
+  filter:
+    image: "lorel/zmqrxlua:lua"
+    entrypoint: lua filter-event.lua
+    environment:
+      - TO=tcp://routerfilterreduce:5559
+      - FROM=tcp://routermapperfilter:5558
+      - "constraint:type==worker"
+    env_file: global.env
+    volumes:
+      - "/path/to/securestream/code:/root/worker"
+    networks:
+      - xp
+
+  routermapperfilter:
+    image: "lorel/zmqrxlua:lua"
+    hostname: routermapperfilter
+    entrypoint: lua router.lua
+    environment:
+      - TO=tcp://*:5558
+      - FROM=tcp://*:5557
+      - "constraint:type==worker"
+    env_file: global.env
+    volumes:
+      - "/path/to/securestream/code:/root/worker"
+    networks:
+      - xp
+
+  mapper:
+    image: "lorel/zmqrxlua:lua"
+    entrypoint: lua map-csv-to-event.lua
+    environment:
+      - TO=tcp://routermapperfilter:5557
+      - FROM=tcp://routerdatamapper:5556
+      - "constraint:type==worker"
+    env_file: global.env
+    volumes:
+      - "/path/to/securestream/code:/root/worker"
+    networks:
+      - xp
+
+  routerdatamapper:
+    image: "lorel/zmqrxlua:lua"
+    hostname: routerdatamapper
+    entrypoint: lua router.lua
+    environment:
+      - TO=tcp://*:5556
+      - FROM=tcp://*:5555
+      - "constraint:type==worker"
+    env_file: global.env
+    volumes:
+      - "/path/to/securestream/code:/root/worker"
+    networks:
+      - xp
+
+  data:
+    image: "lorel/zmqrxlua:lua"
+    entrypoint: lua data-stream.lua
+    environment:
+      - TO=tcp://routerdatamapper:5555
+      - "constraint:type==data"
+      - DATA_FILE=data/2008.csv
+    env_file: global.env
+    volumes:
+      - "/path/to/securestream/code:/root/worker"
+    networks:
+      - xp
+
+
+networks:
+  xp:
+    external:
+      name: default_network
+\end{lstlisting}

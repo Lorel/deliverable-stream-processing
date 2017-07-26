@@ -1,0 +1,97 @@
+% -*- root: Document.tex -*-
+
+\section{\SS{} Usage}
+\label{sec:securestreamusage}
+
+The code of \SS{} can be retrieved from the repository \securestreamrepo{}.
+
+The main idea behind \SS{} is to run each steps of a processing pipeline (\textit{e.g.} Listing~\ref{rx-processing-pipeline-example}) on different nodes of a cluster.
+To do this, \SS{} provides an API built on top of \textsc{RxLua}, the Reactive Extensions for Lua\footnote{\textsc{RxLua}, Reactive Extensions for Lua: \url{https://github.com/bjornbytes/RxLua}.} (see Subsection~\ref{subsec:rxluaapi}), and relies on \zmq{} by the implementation of an extension of the \textsc{RxLua} (see Subsection~\ref{subsec:rxluazmq}).
+Finally, \SS{} provides also another extension of \textsc{RxLua} to use seamlessly the \luavm{} modified to process some code in an SGX enclave (see Subsection~\ref{subsec:rxluasgx}).
+
+
+\subsection{\textsc{RxLua} API}
+\label{subsec:rxluaapi}
+
+\textsc{RxLua} is an API to implement a processsing pipeline in the way of the dataflow programming paradigm.
+This library permits to describe a processsing pipeline like shown in Listing~\ref{rx-processing-pipeline-example}.
+
+\input{partials/rx_processing_pipeline_example}
+
+\newpage
+
+\subsection{\textsc{RxLua} extension for \zmq{}}
+\label{subsec:rxluazmq}
+
+We have implemented a layer on top of \textsc{RxLua} to define a communication channel using \zmq{} between two steps of a processing pipeline.
+This layer has been written in the file \texttt{zmq-rx.lua} and provides 2 functions:
+
+\begin{itemize}
+  \item \textbf{Rx.Observable.fromZmqSocket(\texttt{socket})}: defines a \zmq{} where to get a data stream;
+  \item \textbf{Rx.Observable:subscribeToSocket(\texttt{socket})}: defines a \zmq{} where to send a data stream.
+\end{itemize}
+
+The parameter \texttt{socket} is a formatted string giving the protocol, the address and the port of the socket (\textit{e.g.} \texttt{'tcp://localhost:5555'}).
+
+Using this layer for \zmq{}, we can split the 5 steps of the processsing pipeline shown in Listing~\ref{rx-processing-pipeline-example} on 5 independant files of \lua{} code:
+
+\begin{itemize}[leftmargin=*]
+  \item The data input steam:
+    \input{partials/rx_processing_pipeline_data_stream}
+  \item The mapper from \textsc{CSV} line to data event:
+    \input{partials/rx_processing_pipeline_map_csv_to_event}
+  \item The event filter:
+    \input{partials/rx_processing_pipeline_filter_event}
+  \item The events reducer:
+    \input{partials/rx_processing_pipeline_reduce_events}
+  \item The results printer:
+    \input{partials/rx_processing_pipeline_print_result}
+\end{itemize}
+
+Between each step of this processing pipeline, data are streamed through some routers using the code from the file \texttt{router.lua}.
+These routers forward the data from a step to another one, without any process on them, using some \zmq{} channels.
+
+\newpage
+
+\subsection{\textsc{RxLua} extension for SGX}
+\label{subsec:rxluasgx}
+
+\SS{} can execute the code of a function \texttt{map}, \texttt{filter}, or \texttt{reduce} inside an SGX enclave.
+To do that, it uses the primitives provided by the modified \luavm{} (which are \texttt{sgxprocess}, \texttt{sgxencrypt}, and \texttt{sgxdecrypt}, like described in Chapter~\ref{chap:proto}).
+These primitives are called from the library implemented in the file \texttt{sgx.lua}.
+This library provides also some mocks for these primitives, in case the code has to be executed in a regular \luavm{}.
+
+\SS{} provides finally a layer built on top of \textsc{RxLua}, and which provides the function \texttt{mapSGX}, \texttt{filterSGX}, and \texttt{reduceSGX} with whom the steps of mapping, filtering and reducing (described in Subsection~\ref{subsec:rxluazmq}) can be rewritten as following to be executed inside a SGX enclave:
+
+\begin{itemize}[leftmargin=*]
+  \item The mapper from \textsc{CSV} line to data event:
+    \input{partials/rx_processing_pipeline_sgx_map_csv_to_event}
+  \item The event filter:
+    \input{partials/rx_processing_pipeline_sgx_filter_event}
+  \item The events reducer:
+    \input{partials/rx_processing_pipeline_sgx_reduce_events}
+\end{itemize}
+
+Note that the code of the function passed to each step of the processing pipeline does not change between the regular version and the one usig SGX.
+Only the name of the required file for \texttt{ZmqRx} and the name of the used functions are different.
+
+\newpage
+
+\subsection{\textsc{Docker} images for \SS{}}
+\label{subsec:ssdockerimages}
+
+\SS{} executes each step of the processing pipeline and each router in some \textsc{Docker} containers using either the image \dockerimagelua{} or the one \dockerimageluasgx{}, depending if the code to execute uses the regular \luavm{} or the one modified for SGX.
+These images have to be provided to the configuration file used by \textsc{Docker Compose} to run all the containers of the pipeline on the \textsc{Docker Swarm} cluster (see Listing~\ref{docker-compose-config} for a complete configuration).
+
+For each container, the following values are mandatory:
+
+\begin{itemize}
+  \item \textbf{image}: the \textsc{Docker} image to use, either \dockerimagelua{} or \dockerimageluasgx{};
+  \item \textbf{entrypoint}: the command to run when the container is started, either \texttt{lua} for using the regular \luavm{}, or \texttt{./start.sh} for using the one modified for SGX, each of them followed by the name of the file with the code to execute for this node (\textit{i.e.} the one for the corresponding step of the processing pipeline);
+  \item \textbf{environment}: it expects a list of the environment variables to pass to the container, typically \texttt{TO} and \texttt{FROM} with the address for the corresponding sockets, and a constraint used by the \textsc{Docker Swarm} scheduler to launch the given container on a specific host of the cluster;
+  \item \textbf{env\_file}: pass a file to the container with some environment wariables, typically the ones for setting the logger and the endpoint for the common controller of the pipeline (here the printer) - convenient for giving some variables shared by all containers;
+  \item \textbf{volumes}: the list of the volumes to mount into the container - here have to be mount the directory with the common code of \SS{} and the file with the code of the processing pipeline step to be executed by the current container;
+  \item \textbf{networks}: the list of the networks joined by the container - it must contain the overlay network shared by all containers, and defined at the end of this \textsc{Docker Compose} file.
+\end{itemize}
+
+\input{partials/docker_compose_example}

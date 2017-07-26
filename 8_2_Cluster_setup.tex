@@ -1,0 +1,39 @@
+% -*- root: Document.tex -*-
+
+\section{Cluster Setup}
+\label{sec:clustersetup}
+
+A tiny CLI tool has been implemented to setup easily a \textsc{Docker Swarm} cluster and its overlay network.
+This one can be found in the directory \texttt{remote} of the repository \securestreamrepo{}.
+Once the configuration for the different hosts used to build the cluster is given (cf. Subsection~\ref{subsec:clustersetup:config}), the CLI can be used to build a \textsc{Docker Swarm} cluster (cf. Subsection~\ref{subsec:clustersetup:manage}).
+Note that the example of configuration given here is present in the file \texttt{config.yml.example}: you can copy this file to \texttt{config.yml} and modify it with your own configuration.
+
+When the CLI is called without any command, it returns the list of the available ones:
+
+\begin{lstlisting}[basicstyle=\small]
+$ ./remote.rb
+Welcome to the remote manager !
+
+Version: 0.1.0
+Use one or several (you can chain them) of the following commands:
+
+- help		 Print this usage notice
+- version	 Print used version of Swarm
+- ping		 Check if connexions for each VM are well configured
+- create	 Create cluster
+- network	 Create Docker overlay network
+- hostnames	 Set node hostnames
+- config-docker	 Upgrade Docker with the last release, and configure
+- test		 Run hello world on each Docker node using the Swarm manager
+- init-xp	 Initialize nodes for experimental POC by getting repository
+
+For example:	 ./remote.rb ping config_docker create test network
+\end{lstlisting}
+
+\newpage
+
+\input{8_2_1_Configuration}
+
+\newpage
+
+\input{8_2_2_Manage}

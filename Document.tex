@@ -27,13 +27,16 @@
     nil,not,or,repeat,return,then,until,while,require,alias},% Official LUA keywords
   morekeywords=[2]{},% Your private keywords
   otherkeywords={.,=,~,*,>,:},
+  morestring=[b]',
   morestring=[b]",
   stringstyle={\color{darkred}\itshape},
   breaklines=true,
   breakatwhitespace=true,
   linewidth=\columnwidth,
   comment=[l]{--},
-  escapeinside={(*@}{@*)}
+  escapeinside={(*@}{@*)},
+  frame=bt,
+  numbers=left,
 }
 
 \newcommand\YAMLcolonstyle{\color{darkred}\bfseries}
@@ -58,6 +61,7 @@
                 {>}{{\textcolor{red}\textgreater}}1
                 {|}{{\textcolor{red}\textbar}}1
                 {\ -\ }{{\mdseries\ -\ }}3,
+  frame=bt,
 }
 % END define LUA & YAML style
 
@@ -117,7 +121,12 @@
 \renewcommand{\SS}{\textsc{SecureStreams}\xspace}
 \newcommand{\zmq}{\mbox{\textsc{ZeroMQ}}\xspace}
 \newcommand{\rxl}{\mbox{\textsc{RxLua}}\xspace}
+\newcommand{\lua}{\mbox{\textsc{Lua}}\xspace}
 \newcommand{\luavm}{\mbox{\textsc{LuaVM}}\xspace}
+\newcommand{\securestreamrepo}{\url{https://gitlab.securecloud.works/aurelien.havet/securestreams-poc}}
+\newcommand{\dockerimagelua}{\texttt{lorel/zmqrxlua:lua}}
+\newcommand{\dockerimageluasgx}{\texttt{lorel/zmqrxlua:sgx}}
+
 
 \input{1_Introduction}
 \input{2_SoA}

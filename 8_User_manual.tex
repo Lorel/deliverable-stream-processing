@@ -2,3 +2,27 @@
 
 \chapter{User Manual}
 \label{chap:usermanual}
+
+At the time of writing, \SS{} is not fully implemented, and some automations are yet missing in the launch of the process of a data stream.
+The following sections explain how the current implementation works, and how to run the proof-of-concept which \SS{} have been evaluated on.
+
+\SS{} is running on a legacy standalone \textsc{Docker Swarm} cluster using an overlay network\footnote{\textsc{Docker} overlay network: \url{https://docs.docker.com/engine/userguide/networking/\#overlay-networks-in-swarm-mode}.}.
+First of all, a \textsc{Docker Swarm} cluster have to be deployed on top of a group of hosts.
+Then each processing code has to be defined in separated files.
+Finally, the process of the stream can be launched from the manager of the \textsc{Docker Swarm} cluster using a \textsc{Docker Compose} file.
+Have a look to the Section~\ref{sec:pocusage} to get an idea of how \SS{} can be used.
+
+
+\input{8_1_Infrastructure}
+
+\newpage
+
+\input{8_2_Cluster_setup}
+
+\newpage
+
+\input{8_3_SecureStreams}
+
+\newpage
+
+\input{8_4_POC}

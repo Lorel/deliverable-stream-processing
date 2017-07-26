@@ -1,0 +1,14 @@
+\begin{lstlisting}[language=LUA,caption={Process pipeline with Zmq-RxLua using SGX: filter.},label=rx-processing-sgx-filter-event]
+local ZmqRx = require 'sgx-rx'
+
+local from_socket = 'tcp://localhost:5556'
+local to_socket = 'tcp://localhost:5557'
+
+ZmqRx.Subject.fromZmqSocket(from_socket) -- receive from 'tcp://localhost:5556'
+  :filterSGX(
+    function(event)
+      return (tonumber(event.arrdelay) or 0) > 0
+    end
+  )
+  :subscribeToSocket(to_socket) -- send to 'tcp://localhost:5557'
+\end{lstlisting}

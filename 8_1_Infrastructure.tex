@@ -1,0 +1,73 @@
+% -*- root: Document.tex -*-
+
+\section{Infrastructure}
+\label{sec:infrastructure}
+
+The \textsc{Docker Swarm} cluster can be built with some hosts using:
+
+\begin{itemize}
+  \item \textsc{Ubuntu 16.04.2 LTS};
+  \item \textsc{Docker} v. 1.13.0 (cf. Subsection~\ref{subsec:docker_install});
+  \item \textsc{Docker Swarm} v. 1.2.5 with the \textsc{Docker} image labeled \texttt{swarm:1.2.5}\footnote{\textsc{Docker Swarm} on \textsc{DockerHub}: \url{https://hub.docker.com/_/swarm/}.};
+  \item the key-value store \textsc{Consul} using its latest \textsc{Docker} image\footnote{\textsc{Consul} on \textsc{DockerHub}: \url{https://hub.docker.com/r/progrium/consul/}.}.
+\end{itemize}
+
+\newpage
+
+\subsection{Install \textsc{Docker} v. 1.13.0}
+\label{subsec:docker_install}
+
+Run the following commands to install \textsc{Docker} v. 1.13.0 on \textsc{Ubuntu 16.04.2 LTS}:
+
+\begin{itemize}
+  \item
+    Add the APT key:
+    \begin{lstlisting}[language=bash, basicstyle=\small]
+$ sudo apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 \
+  --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
+    \end{lstlisting}
+  \item
+    Add the \textsc{Docker} repository in the sources list of APT:
+    \begin{lstlisting}[language=bash, basicstyle=\small]
+$ sudo bash \
+  -c 'echo "deb https://apt.dockerproject.org/repo ubuntu-xenial main" \
+  > /etc/apt/sources.list.d/docker.list'
+    \end{lstlisting}
+  \item
+    Update APT:
+    \begin{lstlisting}[language=bash, basicstyle=\small]
+$ sudo apt-get update
+    \end{lstlisting}
+  \item
+    Be sure to have this package installed:
+    \begin{lstlisting}[language=bash, basicstyle=\small]
+$ sudo apt-get install linux-image-extra-$(uname -r)
+    \end{lstlisting}
+  \item
+    You can then list all available package of \textsc{Docker} and should find out the version 1.13.0:
+    \begin{lstlisting}[language=bash, basicstyle=\small]
+$ apt-cache policy docker-engine
+    \end{lstlisting}
+  \item
+    Install \textsc{Docker} v. 1.13.0:
+    \begin{lstlisting}[language=bash, basicstyle=\small]
+$ sudo apt-get install docker-engine=1.13.0-0~ubuntu-xenial
+    \end{lstlisting}
+\end{itemize}
+
+\newpage
+
+\subsection{Configure \textsc{Docker}}
+\label{subsec:docker_config}
+
+\textsc{Docker} has to be configured correctly on each host with the key-value store \textsc{Consul}.
+If your host is using the boot manager \textsc{systemd} (like \textsc{Ubuntu 16.04.2 LTS} does by default), you can edit the file \texttt{/lib/systemd/system/docker.service} and change the value of \texttt{ExecStart} to \texttt{/usr/bin/docker daemon} the following options:
+
+\begin{itemize}
+  \item \texttt{-H tcp://0.0.0.0:2375}: bind \textsc{Docker} on \texttt{0.0.0.0} for it to be reachable from outside the host;
+  \item \texttt{--cluster-store=consul://172.16.0.2:8500}: provide the IP address (\textit{e.g.} here \texttt{172.16.0.2}) and the port (\textit{e.g.} here \texttt{8500}) of the key-value store \textsc{Consul};
+  \item \texttt{--cluster-advertise=enp0s31f6:2375}: provide the network interface (\textit{e.g.} here \texttt{enp0s31f6}) and the port (\textit{e.g.} here \texttt{2375}) of the \textsc{Docker} daemon;
+  \item \texttt{--label type="sgx"}: the label to give to the \textsc{Docker} daemon in the \textsc{Docker Swarm} cluster (it is mandatory to target the correct host when launching the containers with \textsc{Docker Compose}, as we will explain later).
+\end{itemize}
+
+Note that all this configuration can be defined easily using the tiny CLI tool \texttt{remote} (cf. Section~\ref{sec:clustersetup}).
