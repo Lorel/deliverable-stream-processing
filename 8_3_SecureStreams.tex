@@ -95,3 +95,21 @@ For each container, the following values are mandatory:
 \end{itemize}
 
 \input{partials/docker_compose_example}
+
+\newpage
+
+\subsection{Set log level of \SS{}}
+\label{subsec:ss-log-level}
+
+The logging system of \SS{} relies on the library \textsc{log.lua}\footnote{\textsc{log.lua} library: \url{https://github.com/rxi/log.lua}}, but uses this fork: \url{https://github.com/Lorel/log.lua}.
+This logger is redirected on the logs of the container, then they can be monitored using the command \texttt{docker logs -f container\_name} on the \textsc{Docker Swarm} manager.
+It owns several levels of message.
+This level impacts the performances of \SS{}.
+It has to be set according to the usage, by setting the environment variable \texttt{LOG\_LEVEL} with one of those values:
+
+\begin{itemize}
+  \item \textbf{trace}: very verbose, it will generate a message for each event sent and received both by a \texttt{worker} or a \texttt{router};
+  \item \textbf{debug}: verbose, it will generate, at a frequency defined by the environment variable \texttt{LOG\_RATE} (expects an integer, default value is 100), a message for each event sent and received both by a \texttt{worker} or a \texttt{router};
+  \item \textbf{info}: not verbose, default value, it generates some messages at the beginning and the end of the process;
+  \item \textbf{warn}, \textbf{error}, \textbf{fatal}: do not display any message.
+\end{itemize}
