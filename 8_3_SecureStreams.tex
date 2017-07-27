@@ -98,6 +98,20 @@ For each container, the following values are mandatory:
 
 \newpage
 
+\subsection{\SS{}'s dependencies in development}
+\label{subsec:ss-dependencies}
+
+\textsc{Docker} images embed all the dependencies of \SS{}.
+If you want to run it locally, you have to use \textsc{Lua} version 5.3.0 or higher, and install the following dependencies:
+
+\begin{itemize}
+  \item \textsc{lzmq}, \textsc{Lua} binding to \zmq{}, using this repository: \url{https://github.com/Lorel/lzmq};
+  \item \textsc{Lua CJSON}, a fast \textsc{JSON} encoding/parsing module for Lua, using this repository: \url{https://github.com/cloudwu/lua-cjson};
+  \item \textsc{luacsv}, using this repository: \url{https://github.com/Lorel/luacsv};
+  \item \textsc{RxLua}, Reactive Extensions for Lua, using this repository: \url{https://github.com/bjornbytes/RxLua};
+  \item \textsc{log.lua}, A tiny logging module for Lua, using this repository: \url{https://github.com/Lorel/log.lua}.
+\end{itemize}
+
 \subsection{Set log level of \SS{}}
 \label{subsec:ss-log-level}
 
